@@ -9,3 +9,4 @@
 /captures
 .externalNativeBuild
 *.keystore
+app/signing.properties

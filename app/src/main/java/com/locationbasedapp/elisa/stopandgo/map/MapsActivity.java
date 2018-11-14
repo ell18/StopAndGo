@@ -1,7 +1,11 @@
-package com.locationbasedapp.elisa.stopandgo;
+package com.locationbasedapp.elisa.stopandgo.map;
 
-import android.support.v4.app.FragmentActivity;
+//import android.support.v4.app.FragmentActivity;
+import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.view.View;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -10,18 +14,30 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+import com.locationbasedapp.elisa.stopandgo.R;
+import com.locationbasedapp.elisa.stopandgo.location.BaseLocationAwareActivity;
+
+public class MapsActivity extends BaseLocationAwareActivity implements IMapsView,
+        OnMapReadyCallback, View.OnClickListener {
 
     private GoogleMap mMap;
+    private MapsPresenter mPresenter;
+    private View mRootView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }
+        mPresenter = new MapsPresenter(this, mLocationManager);
+
+        mRootView = findViewById(android.R.id.content);
+        findViewById(R.id.floatingActionButtonLocateMe).setOnClickListener(this);
     }
 
 
@@ -42,5 +58,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    }
+
+    @Override
+    public void onClick(View view) {
+
+    }
+
+    @Override
+    public void moveCameraTo(Location location) {
+
+    }
+
+    @Override
+    public void showError(String message) {
+
+    }
+
+    @Override
+    public void onLocationChanged(@NonNull Location location) {
+
+    }
+
+    @Override
+    public void followLocationVisibility(int visibility) {
+
     }
 }

@@ -1,8 +1,45 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 27
+    def googleMapsApiKeyRelease = "PLACE_HOLDER"
+
+
+    Properties props = new Properties()
+
+    def propFile = file('./signing.properties')
+
+    if (propFile.canRead() && props != null) {
+
+        def GOOGLE_MAPS_API_KEY_RELEASE = "GOOGLE_MAPS_API_KEY_RELEASE"
+        def KEY_PASSWORD_DEBUG = "KEY_PASSWORD_DEBUG"
+        def KEY_ALIAS_DEBUG = "KEY_ALIAS_DEBUG"
+        def STORE_FILE_DEBUG = "STORE_FILE_DEBUG"
+
+
+        props.load(new FileReader(propFile))
+
+        if(props.containsKey(GOOGLE_MAPS_API_KEY_RELEASE)) {
+
+            googleMapsApiKeyRelease = props[GOOGLE_MAPS_API_KEY_RELEASE]
+
+        }
+
+        if (props.containsKey(STORE_FILE_DEBUG) && props.containsKey(KEY_PASSWORD_DEBUG) && props.containsKey(KEY_ALIAS_DEBUG)) {
+
+            android.signingConfigs.debug.storeFile = file(props[STORE_FILE_DEBUG])
+
+            android.signingConfigs.debug.storePassword = props[KEY_PASSWORD_DEBUG]
+
+            android.signingConfigs.debug.keyAlias = props[KEY_ALIAS_DEBUG]
+
+            android.signingConfigs.debug.keyPassword = props[KEY_PASSWORD_DEBUG]
+
+        }
+
+    }
+    compileSdkVersion 28
     defaultConfig {
+        manifestPlaceholders = [googleApiKey:googleMapsApiKeyRelease]
         applicationId "com.locationbasedapp.elisa.stopandgo"
         minSdkVersion 23
         targetSdkVersion 27
@@ -22,7 +59,10 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.google.android.gms:play-services-maps:16.0.0'
+    implementation 'com.google.android.gms:play-services-location:16.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    implementation 'com.android.support:design:28.0.0'
 }
