@@ -23,7 +23,7 @@ class GooglePlayServicesLocationSource {
 
     GooglePlayServicesLocationSource(@NonNull final Activity activity,
                                      @NonNull final PermissionManager permissionManager,
-                                     @NonNull final SettingsClientManager settingsClientManager) {
+                                     @NonNull final SettingsClientManager settingsClientManager, LocationManager locationManager) {
         mActivity = activity;
         mPermissionManager = permissionManager;
         mSettingsClientManager = settingsClientManager;
@@ -73,6 +73,12 @@ class GooglePlayServicesLocationSource {
         mLocationRequest.setInterval(10_000);
         mLocationRequest.setFastestInterval(5_000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    public void startReceivingLocationUpdates() {
+    }
+
+    public void stopReceivingLocationUpdates() {
     }
 }
 

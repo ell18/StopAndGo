@@ -1,6 +1,7 @@
 package com.locationbasedapp.elisa.stopandgo.map;
 
 //import android.support.v4.app.FragmentActivity;
+import android.annotation.SuppressLint;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,6 +10,7 @@ import android.view.View;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -18,11 +20,13 @@ import com.locationbasedapp.elisa.stopandgo.R;
 import com.locationbasedapp.elisa.stopandgo.location.BaseLocationAwareActivity;
 
 public class MapsActivity extends BaseLocationAwareActivity implements IMapsView,
-        OnMapReadyCallback, View.OnClickListener {
+        OnMapReadyCallback, View.OnClickListener, LocationSource {
 
     private GoogleMap mMap;
     private MapsPresenter mPresenter;
     private View mRootView;
+    private OnLocationChangedListener mMapLocationListener = null;
+    private boolean mFirstLocationUpdate = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,30 +62,68 @@ public class MapsActivity extends BaseLocationAwareActivity implements IMapsView
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
+        mMap.setLocationSource(this);
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mPresenter.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        mPresenter.onPause();
+        super.onPause();
     }
 
     @Override
     public void onClick(View view) {
-
+        mPresenter.onClick(view.getId());
     }
 
     @Override
-    public void moveCameraTo(Location location) {
-
+    public void moveCameraTo(@NonNull final Location location) {
+        if (mMap == null) {
+            return;
+        }
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),
+                location.getLongitude()), 17));
     }
 
     @Override
-    public void showError(String message) {
-
+    public void showError(@NonNull String message) {
+        Snackbar.make(mRootView, message, Snackbar.LENGTH_LONG).show();
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onLocationChanged(@NonNull Location location) {
-
+        if (mFirstLocationUpdate) {
+            if (mLocationManager.hasLocationPermission()) {
+                mMap.setMyLocationEnabled(true);
+            }
+            mFirstLocationUpdate = false;
+        }
+        if (mMapLocationListener != null) {
+            mMapLocationListener.onLocationChanged(location);
+        }
     }
 
     @Override
     public void followLocationVisibility(int visibility) {
 
+    }
+
+    @Override
+    public void activate(OnLocationChangedListener onLocationChangedListener) {
+        mMapLocationListener = onLocationChangedListener;
+    }
+
+    @Override
+    public void deactivate() {
+        mMapLocationListener = null;
     }
 }

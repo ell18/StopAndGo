@@ -65,4 +65,9 @@ class PermissionManager {
     private boolean isFirstLocationPermissionRequest(@NonNull final String manifestPermissionName) {
         return !mSettings.readFomPreferences(manifestPermissionName);
     }
+
+    //public boolean hasPermission(String accessFineLocation) {
+    public boolean hasPermission(String accessFineLocation) {
+        return true;
+    }
 }
